@@ -122,6 +122,29 @@ func TestTransport(t *testing.T) {
 	}
 }
 
+func TestCancelRequest(t *testing.T) {
+	ms := appdash.NewMemoryStore()
+	rec := appdash.NewRecorder(appdash.SpanID{1, 2, 3}, appdash.NewLocalCollector(ms))
+	req, _ := http.NewRequest("GET", "http://example.com/foo", nil)
+	transport := &Transport{
+		Recorder: rec,
+	}
+	client := &http.Client{
+		Timeout:   10 * time.Millisecond,
+		Transport: transport,
+	}
+
+	resp, err := client.Do(req)
+
+	expected := "Get http://example.com/foo: net/http: request canceled while waiting for connection"
+	if err == nil || err.Error() != expected {
+		t.Errorf("got %#v, want %s", err, expected)
+	}
+	if resp != nil {
+		t.Errorf("got http.Response %#v, want nil", resp)
+	}
+}
+
 type mockTransport struct {
 	req  *http.Request
 	resp *http.Response
