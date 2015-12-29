@@ -130,7 +130,7 @@ func TestCancelRequest(t *testing.T) {
 		Recorder: rec,
 	}
 	client := &http.Client{
-		Timeout:   10 * time.Millisecond,
+		Timeout:   1 * time.Millisecond,
 		Transport: transport,
 	}
 
